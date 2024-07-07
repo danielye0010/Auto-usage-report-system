@@ -2,7 +2,7 @@
 ## Disclaimer
 All privacy and sensitive data have been meticulously removed or anonymized in this project. The information and data presented here are solely for demonstration purposes. This demo aims to illustrate the project's logic and processes without compromising any confidential or personal information. Any resemblance to actual data is purely coincidental.
 
-# Introduction
+## Introduction
 
 This project focuses on automating the generation and processing of monthly and trimester reports for the usage of Electronic Lab Notebooks (ELN). The goal is to provide detailed insights into how ELNs are utilized across different departments and units within an organization. By leveraging data from multiple sources, the project aims to facilitate better understanding and analysis of ELN usage patterns.
 
@@ -61,4 +61,4 @@ The final step involves transferring the generated reports to a designated Googl
 - **Reliability**: Automated processes reduce the risk of human error, ensuring accurate and consistent reporting.
 
 ## Contribution and maintenance  
-UW-Madison RCI - ELN Service team
+UW-Madison Research Cyberinfrastructure - ELN Service team
