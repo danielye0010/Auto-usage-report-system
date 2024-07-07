@@ -1,0 +1,101 @@
+import os
+from hashlib import sha1
+import hmac
+import base64
+import urllib
+import requests
+import xml.etree.ElementTree as ET
+import datetime
+import boto3
+
+# Get the current date in 'YYYY-MM-DD' format
+def get_today_str():
+    return datetime.date.today().strftime('%Y-%m-%d')
+
+# Set variables
+today = get_today_str()
+cwd = os.getcwd()
+
+# Get credentials from environment variables for security
+key_id = os.environ.get('KEY_ID')
+access_password = os.environ.get('ACCESS_PASSWORD')
+UID = os.environ.get('UID')
+aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+region_name = "us-east-2"
+
+# Log into AWS S3 for later uploading
+s3 = boto3.client('s3', region_name=region_name,
+                  aws_access_key_id=aws_access_key_id,
+                  aws_secret_access_key=aws_secret_access_key)
+
+# Get current epoch time from API
+time_call = f"https://api.labarchives.com/api/utilities/epoch_time?akid={key_id}"
+time_response = requests.get(time_call)
+time_text = time_response.text
+root = ET.fromstring(time_text)
+expires = root[0].text
+
+# Download reports and save to current working directory
+report_types = ["notebook_usage_report", "usage_report", "pdf_generation_report"]
+
+for api_method in report_types:
+    # Create the signature for authentication
+    sig_raw = key_id + api_method + expires
+    sig_byte = bytearray(sig_raw.encode())
+    pass_byte = bytearray(access_password.encode())
+    sig_digested = hmac.new(pass_byte, sig_byte, digestmod=sha1).digest()
+    sig64 = base64.b64encode(sig_digested)
+    sig = urllib.parse.quote(sig64, safe='')
+
+    # Construct the API call URL
+    auth = f"&akid={key_id}&expires={expires}&sig={sig}"
+    call = f"https://api.labarchives.com/api/site_license_tools/{api_method}?uid={UID}{auth}"
+    file_name = f"uw-madison_{api_method}.csv"
+    
+    # Get the report from the API
+    response = requests.get(call)
+    with open(file_name, 'wb') as file:
+        file.write(response.content)
+
+# Loop to change file name and upload to AWS S3
+for file in os.listdir(cwd):
+    file_name, file_suffix = os.path.splitext(file)
+    file_path = os.path.join(cwd, file)
+    
+    # Process only CSV files
+    if file_suffix != '.csv':
+        continue
+
+    # Create new file name with the current date
+    new_file = f"{file_name}_{today}.tsv"
+    new_file_path = os.path.join(cwd, new_file)
+    
+    # Remove existing file if it exists
+    if os.path.exists(new_file_path):
+        os.remove(new_file_path)
+
+    # Convert CSV to TSV
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = f.read().replace(',', '\t')
+
+    with open(new_file_path, 'w', encoding='utf-8') as f:
+        f.write(data)
+
+    # Determine the S3 key based on the file type
+    basename = os.path.basename(new_file_path)
+    s3_key = "error"
+
+    if "notebook_usage" in basename:
+        s3_key = f"notebook-data/uw-madison_notebook_usage_{today}.tsv"
+    elif "pdf" in basename:
+        s3_key = f"nb-download-data/uw-madison_pdf_offline_nb_generation_report_{today}.tsv"
+    elif "uw-madison_usage" in basename:
+        s3_key = f"usage-data/uw-madison-usage_{today}.tsv"
+
+    # Upload the file to S3
+    s3.upload_file(new_file_path, "your-s3-bucket-name", s3_key)
+
+
+    # Upload the file to S3
+    s3.upload_file(new_file_path, "your-s3-bucket-name", s3_key)
