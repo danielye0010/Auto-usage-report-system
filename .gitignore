@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.Rhistory
+.RData
+.Rproj.user/
+.DS_Store
+
+# Secrets / local configuration
+.env
+*.json
+!*.example.json
+
+# Production or generated data
+data/
+usage-data/
+notebook-data/
+reports/
+*.pdf
+*.tsv
+*.csv
+
+# Local report templates may contain organization-specific content
+templates/
