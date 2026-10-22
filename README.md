@@ -4,6 +4,12 @@ This repository is a **sanitized engineering demonstration** of an automated rep
 
 It shows how usage data can move from a vendor API through cloud storage and analytics, into reproducible R-based reports and optional cloud-drive delivery. Organization-specific datasets, credentials, identifiers, report templates, names, and internal infrastructure details are intentionally not included.
 
+## Real-world application
+
+Developed and deployed for an electronic lab notebook service with **10,000+ users**, the original system automated recurring usage analytics and reporting for laboratories, departments, and the institution. It connected API collection, cloud storage/querying, and RMarkdown reporting to support day-to-day service operations.
+
+The public code is a sanitized engineering demonstration of that work. The deployment scale describes the original service; production user records, organization configuration, and internal report templates are not included.
+
 ## What the pipeline demonstrates
 
 ```text
