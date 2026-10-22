@@ -1,5 +1,7 @@
 # Automated ELN Usage Reporting Pipeline
 
+[**Website →**](https://danielye.net/projects/autoreport/)
+
 This repository is a **sanitized engineering demonstration** of an automated reporting pipeline for an Electronic Lab Notebook (ELN) service.
 
 It shows how usage data can move from a vendor API through cloud storage and analytics, into reproducible R-based reports and optional cloud-drive delivery. Organization-specific datasets, credentials, identifiers, report templates, names, and internal infrastructure details are intentionally not included.
